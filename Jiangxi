@@ -1,36 +1,74 @@
 #!/bin/bash
 
-# 提示作者
-echo "作者：江晚"
+echo "                                              
+安卓一键部署脚本，本脚本为二次创作
+原作者为：hoping喵，坏水秋
+二改作者:JiangNight
+类脑Discord: https://discord.gg/HWNkueX34q
+"
 
-# 颜色定义
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+echo -e "\033[0;31m开启魔法，保持良好的网络环境\033[0m\n"
 
-# 伪进度条函数
-progress_bar() {
-    echo -n "[$1] 正在下载..."
-    for i in $(seq 1 20); do
-        echo -n "#"
-        sleep 0.1
-    done
-    echo ""
-}
+read -p "确保开了魔法后按回车继续"
 
-# 执行并检查命令
-execute_command() {
-    local CMD="$1"
-    local NAME="$2"
+current=/data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu
 
-    progress_bar "$NAME"
-    if eval "$CMD" > /dev/null 2>&1; then
-        echo -e "${GREEN}${NAME} 安装成功${NC}"
-    else
-        echo -e "${RED}${NAME} 安装失败${NC}"
-    fi
-}
+yes | apt update
 
-# 执行 apt update 和 apt upgrade (如果是Termux上的pkg)
-execute_command "yes | pkg update" "pkg update"
-execute_command "yes | pkg upgrade -y" "pkg upgrade"
+yes | apt upgrade
+
+# 安装proot-distro
+DEBIAN_FRONTEND=noninteractive pkg install proot-distro -y
+
+# 创建并安装Ubuntu
+DEBIAN_FRONTEND=noninteractive proot-distro install ubuntu
+
+# Check Ubuntu installed successfully
+ if [ ! -d "$current" ]; then
+   echo "Ubuntu安装失败了，请更换魔法或者手动安装Ubuntu"
+    exit 1
+ fi
+
+    echo "Ubuntu成功安装到Termux"
+
+echo "正在安装相应软件"
+
+DEBIAN_FRONTEND=noninteractive pkg install git vim curl xz-utils -y
+
+if [ -d "SillyTavern" ]; then
+  cp -r SillyTavern $current/root/
+fi
+
+cd $current/root
+
+echo "正在为Ubuntu安装node"
+if [ ! -d node-v20.10.0-linux-arm64.tar.xz ]; then
+    curl -O https://nodejs.org/dist/v20.15.1/node-v20.15.1-linux-arm64.tar.xz
+
+tar xf node-v20.15.1-linux-arm64.tar.xz
+
+echo "export PATH=\$PATH:/root/node-v20.15.1-linux-arm64/bin" >>$current/etc/profile
+fi
+
+if [ ! -d "SillyTavern" ]; then
+git clone https://github.com/SillyTavern/SillyTavern
+fi
+
+git clone -b test https://github.com/teralomaniac/clewd
+
+curl -O https://raw.githubusercontent.com/hopingmiao/termux_using_Claue/main/sac.sh
+
+if [ ! -f "$current/root/sac.sh" ]; then
+   echo "启动文件下载失败了，换个魔法或者手动下载试试吧"
+   exit
+fi
+
+ln -s /data/data/com.termux/files/usr/var/lib/proot-distro/installed-rootfs/ubuntu/root
+
+echo "bash /root/sac.sh" >>$current/root/.bashrc
+
+echo "proot-distro login ubuntu" >>/data/data/com.termux/files/home/.bashrc
+
+source /data/data/com.termux/files/home/.bashrc
+
+exit
