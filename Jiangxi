@@ -42,7 +42,7 @@ fi
 cd $current/root
 
 echo "正在为Ubuntu安装node"
-if [ ! -d node-v20.10.0-linux-arm64.tar.xz ]; then
+if [ ! -d node-v20.15.1-linux-arm64.tar.xz ]; then
     curl -O https://nodejs.org/dist/v20.15.1/node-v20.15.1-linux-arm64.tar.xz
 
 tar xf node-v20.15.1-linux-arm64.tar.xz
@@ -56,7 +56,7 @@ fi
 
 git clone -b test https://github.com/teralomaniac/clewd
 
-curl -O https://raw.githubusercontent.com/hopingmiao/termux_using_Claue/main/sac.sh
+curl -O https://raw.githubusercontent.com/Wananight/Android-Termux/main/JiangNi.sh
 
 if [ ! -f "$current/root/sac.sh" ]; then
    echo "启动文件下载失败了，换个魔法或者手动下载试试吧"
