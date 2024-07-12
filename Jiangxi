@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# 提示作者
+echo "作者：江晚"
+
+# 颜色定义
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# 伪进度条函数
+progress_bar() {
+    echo -n "[$1] 正在下载..."
+    for i in $(seq 1 20); do
+        echo -n "#"
+        sleep 0.1
+    done
+    echo ""
+}
+
+# 执行并检查命令
+execute_command() {
+    local CMD="$1"
+    local NAME="$2"
+
+    progress_bar "$NAME"
+    if eval "$CMD" > /dev/null 2>&1; then
+        echo -e "${GREEN}${NAME} 安装成功${NC}"
+    else
+        echo -e "${RED}${NAME} 安装失败${NC}"
+    fi
+}
+
+# 执行 apt update 和 apt upgrade (如果是Termux上的pkg)
+execute_command "yes | pkg update" "pkg update"
+execute_command "yes | pkg upgrade -y" "pkg upgrade"
